@@ -13,10 +13,13 @@ inputs:
     default: "stepzen.net"
   account:
     description: "StepZen account name"
-    required: true
+    required: false
   adminkey:
-    description: "Admin key of the StepZen account"
+    description: "Admin key of the StepZen account OR MCSP IAM instance's API key"
     required: true
+  instanceid:
+    description: "MCSP IAM instance id"
+    required: false
   max_attempts:
     description: "Number of retry attempts."
     required: false
@@ -41,6 +44,12 @@ outputs:
   apikey:
     description: "API key for the account."
     value: ${{ steps.output.outputs.apikey }}
+  instanceid: 
+    description: "MCSP IAM service instance id"
+    value: ${{ steps.output.outputs.instanceid }}
+  mcspiamjwt:
+    description: "MCSP IAM JWT"
+    value: ${{ steps.output.outputs.mcspiamjwt }}
 
 runs:
   using: "composite"
@@ -58,12 +67,28 @@ runs:
         max_attempts: ${{ inputs.max_attempts }}
         retry_wait_seconds: ${{ inputs.retry_wait_seconds }}
         shell: bash
-        command: stepzen login ${{ inputs.domain }} --account ${{ inputs.account }} --adminkey ${{ inputs.adminkey }}
+        command: |
+          if [ "${{ inputs.account }}" != "" ]; then
+            stepzen login ${{ inputs.domain }} --account ${{ inputs.account }} --adminkey ${{ inputs.adminkey }}
+          elif [ "${{ inputs.instanceid }}" != "" ]; then
+            stepzen login ${{ inputs.domain }} --instanceId ${{ inputs.instanceid }} --adminkey ${{ inputs.adminkey }}
+          else
+            echo "Not found valid account name or instance id"
+          fi          
     - id: output
       run: |
-        apikey=$(stepzen whoami --apikey)
-        echo "::add-mask::${apikey}"
-        echo "domain=$(stepzen whoami --domain)" >> $GITHUB_OUTPUT
-        echo "account=${{ inputs.account }}" >> $GITHUB_OUTPUT
+        if [ "${{ inputs.account }}" != "" ]; then
+          apikey=$(stepzen whoami --apikey)
+          echo "::add-mask::${apikey}"
+          echo "account=${{ inputs.account }}" >> $GITHUB_OUTPUT
+        elif [ "${{ inputs.instanceid }}" != "" ]; then
+          echo "mcspiamjwt=$(stepzen whoami --accesstoken)" >> $GITHUB_OUTPUT
+          echo "instanceid=${{ inputs.instanceid }}" >> $GITHUB_OUTPUT
+          # Account name needed for endpoint URL creation 
+          echo "account=$(stepzen whoami --account)" >> $GITHUB_OUTPUT        
+        else
+            echo "Not able to find the stepzen's api key or MCSP JWT"
+        fi                 
+        echo "domain=$(stepzen whoami --domain)" >> $GITHUB_OUTPUT        
         echo "apikey=${apikey}" >> $GITHUB_OUTPUT
       shell: bash
