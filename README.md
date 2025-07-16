@@ -16,8 +16,8 @@ Node and StepZen CLI must be installed, see [stepzen-dev/stepzen-install action]
 
 - `domain` - StepZen domain (defaults to stepzen.net)
 - `account` - StepZen account name
-- `instanceid` - MCSP IAM instance id
-- `adminkey` - Admin key of the StepZen account OR MCSP IAM instance's API key
+- `instanceid` - API Connect for GraphQL instance identifier
+- `adminkey` - Admin key of the StepZen account OR API Connect for GraphQL instance's API key
 - `max_attempts` - Number of retry attempts.
 - `retry_wait_seconds` - Time to wait between retries in seconds.
 - `timeout_seconds` - Seconds to wait before attempt times out.
@@ -27,8 +27,8 @@ Node and StepZen CLI must be installed, see [stepzen-dev/stepzen-install action]
 - `domain` - StepZen domain
 - `account` - StepZen account name
 - `apikey` - API key for the account (not the admin key)
-- `instanceid` - MCSP IAM instance id
-- `mcspiamjwt` - MCSP IAM access token
+- `instanceid` - API Connect for GraphQL instance identifier
+- `token` -  Access token
 
 ## Example
 - Login using stepzen account and admin key
@@ -53,7 +53,7 @@ Node and StepZen CLI must be installed, see [stepzen-dev/stepzen-install action]
 
 <!-- end usage -->
 
-- Login using MCSP IAM instance id and API key
+- Login using API Connect for GraphQL instance identifier and API key
 <!-- start usage -->
 
 ```yaml
@@ -63,10 +63,10 @@ Node and StepZen CLI must be installed, see [stepzen-dev/stepzen-install action]
     # Default: 'stepzen.net'
     domain: ""
 
-    # The MCSP IAM instance id to use.
+    # The API Connect for GraphQL instance identifier to use.
     instanceid: ""
 
-    # The MCSP IAM instance's API key to use, likely stored in secrets
+    # The API Connect for GraphQL instance's API key to use, likely stored in secrets
     # [Learn more about creating and using encrypted secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
     #
     # Required.
